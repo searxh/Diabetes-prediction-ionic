@@ -1,0 +1,164 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="shade">
+    <ion-title>
+      Welcome
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" scrollToTop class="shade">
+  <ion-header collapse="condense">
+    <ion-toolbar class="shade">
+      <ion-title size="large">Welcome</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div>
+    <ion-card [hidden]="predict_card">
+      <ion-item>
+        <h2>Diabetes Prediction</h2>
+      </ion-item>
+      <ion-card>
+        <ion-card-content>
+          <canvas #doughnutCanvas style="position: relative; height:15vh; width:30vw"></canvas>
+        </ion-card-content>
+      </ion-card>
+      <ion-card>
+        <ion-card-content>
+          <div *ngIf='prediction$ | async as w'>
+            <div *ngFor='let d of w.data;let i=index;'>
+              ㅤ{{pred_dis[i]}} {{d.toFixed(2)}}
+            </div>
+            <ion-item>
+              <ion-progress-bar color="danger" value="{{diabetes[3]}}"></ion-progress-bar>
+            </ion-item>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </ion-card>
+  </div>
+  <ion-card>
+    <ion-item>
+      <h2>What is Diabetes?</h2>
+    </ion-item>
+    <ion-card-content>
+      <p>Diabetes is a serious chronic disease in which individuals lose the ability to effectively regulate 
+      levels of glucose in the blood, and can lead to reduced quality of life and life expectancy.
+      <br><br>
+      After different foods are broken down into sugars during digestion, the sugars are then released 
+      into the bloodstream. This signals the pancreas to release insulin. Insulin helps enable cells 
+      within the body to use those sugars in the bloodstream for energy.</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-item>
+      <h2>About <ion-icon name="help-circle-outline"></ion-icon></h2>
+    </ion-item>
+    <ion-card>
+      <ion-item>
+        <h4>Machine Learning</h4>
+      </ion-item>
+      <ion-card-content>
+        <p>The prediction was made with the gradient boosting classifier, a machine learning algorithm used for classification.
+        <br><br>
+        In particular, the accuracy of the trained model is 76% for the provided dataset. 
+        <br><br>
+        Furthermore, there are a total of 21 parameters that were taken into account to predict the final diabetes risk value, which were the 
+        last probability value before they were rounded to either 0 or 1 by the algorithm to provide users with more insight.</p>
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-item>
+        <h4>Dataset</h4>
+      </ion-item>
+      <ion-card-content>
+        <p>
+        The dataset was from the "Behavioral Risk Factor Surveillance System (BRFSS)", a health-related telephone survey that was 
+        conducted in the US each year with over 300 features.
+        <br><br>
+        More specifically, the dataset was from the year 2015 and was processed to contain only 22 features that were deemed to be
+        important risk factors of diabetes.
+        <br><br>
+        The data is then cleaned and balanced to achieve an equal number of respondents having diabetes and having no diabetes, which
+        had shortened the data to around 70k individuals and also made it more suitable for machine learning algorithms.</p>
+      </ion-card-content>
+    </ion-card>
+  </ion-card>
+
+  <ion-card>
+    <ion-item>
+      <h2>Recent Predictions</h2>
+      <h6>Your last 10 predictions</h6>
+    </ion-item>
+    <ion-card-content>
+      <ion-button class="shade1" expand="full" (click)=update_number()>
+        SHOW HISTORY
+      </ion-button>
+    </ion-card-content>
+    <div *ngIf="trigger_history">
+      <ion-list>
+        <div *ngFor="let d of history_data">
+          <ion-card>
+            <ion-card-content>
+              <p>ㅤㅤㅤNo Diabetes: {{d.b.toFixed(2)}}<br>ㅤㅤㅤㅤDiabetes: {{(1-d.b).toFixed(2)}}</p>
+              <div *ngIf="(1-d.b)>0.5">
+                <ion-progress-bar color="danger" value="{{d.b}}"></ion-progress-bar>
+              </div>
+              <div *ngIf="d.b>0.5">
+                <ion-progress-bar color="success" value="{{d.b}}"></ion-progress-bar>
+              </div>
+              <ion-grid fixed="true">
+                <ion-row>
+                  <ion-col><p>Status: {{d.a}}</p></ion-col>
+                  <ion-col><p>High BP: {{d.c}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>High Chol: {{d.d}}</p></ion-col>
+                  <ion-col><p>Chol Check: {{d.e}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>BMI: {{d.f}}</p></ion-col>
+                  <ion-col><p>Smoker: {{d.g}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Stroke: {{d.h}}</p></ion-col>
+                  <ion-col><p>Heart Dis: {{d.i}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Exercise: {{d.j}}</p></ion-col>
+                  <ion-col><p>Fruits: {{d.k}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Vegetables: {{d.l}}</p></ion-col>
+                  <ion-col><p>Alcohol: {{d.m}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Hlth Care: {{d.n}}</p></ion-col>
+                  <ion-col><p>Med Cost: {{d.o}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Gen Hlth: {{d.p}}</p></ion-col>
+                  <ion-col><p>Men Hlth: {{d.q}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Phy Hlth: {{d.r}}</p></ion-col>
+                  <ion-col><p>Diff Walk: {{d.s}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Sex: {{d.t}}</p></ion-col>
+                  <ion-col><p>Age: {{d.u}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Education: {{d.v}}</p></ion-col>
+                  <ion-col><p>Income: {{d.w}}</p></ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-list>
+    </div>
+  </ion-card>
+
+
+</ion-content>

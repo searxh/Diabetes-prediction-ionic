@@ -1,0 +1,189 @@
+<ion-header [translucent]="true">
+  <ion-toolbar class="shade">
+    <ion-title>Data Analysis</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="shade">
+  <ion-header collapse="condense">
+    <ion-toolbar class="shade">
+      <ion-title size="large">Data Analysis</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card>
+    <ion-item class="corr1"><h2>Correlation Check</h2></ion-item>
+    <ion-card-content class="shade1">
+      <p>
+        Check up to three correlation values between each pair of parameters
+        <br><br>
+        Note: A1-2 is the first pair, B1-2 is the second pair, C1-2 is the third pair
+      </p>
+    </ion-card-content>
+    <ion-list>
+      <ion-item>
+        <ion-label><p>A1</p></ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="param[0]">
+          <div *ngFor='let d of variables;let i=index'>
+            <ion-select-option value="{{i}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+        <ion-label><p>A2</p></ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="param[1]">
+          <div *ngFor='let d of variables;let i=index'>
+            <ion-select-option value="{{i}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label><p>B1</p></ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="param[2]">
+          <div *ngFor='let d of variables;let i=index'>
+            <ion-select-option value="{{i}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+        <ion-label><p>B2</p></ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="param[3]">
+          <div *ngFor='let d of variables;let i=index'>
+            <ion-select-option value="{{i}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label><p>C1</p></ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="param[4]">
+          <div *ngFor='let d of variables;let i=index'>
+            <ion-select-option value="{{i}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+        <ion-label><p>C2</p></ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="param[5]">
+          <div *ngFor='let d of variables;let i=index'>
+            <ion-select-option value="{{i}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+    <ion-card-content>
+      <div [hidden]="corr_card">
+        <canvas #barCanvas style="position: chart; height:40vh; width:40vw"></canvas>
+      </div>
+      <ion-button expand="full" class="shade1" (click)=refreshChart()>REFRESH CHART</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-item><h2>Dataset Query</h2></ion-item>
+    <ion-item><h6>Filter by:</h6></ion-item>
+    <ion-card>
+      <ion-item>
+        <ion-label>Parameter</ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="filter_param">
+          <ion-select-option value="()">None</ion-select-option>
+          <div *ngFor="let d of variables;let i=index">
+            <ion-select-option value="{{variables[i]}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Operator</ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="filter_op">
+          <ion-select-option value="()">None</ion-select-option>
+          <ion-select-option value="lesser">Less than</ion-select-option>
+          <ion-select-option value="equal">Equal to</ion-select-option>
+          <ion-select-option value="greater">Greater than</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-input [(ngModel)]="filter_value" placeholder="Enter value"></ion-input>
+      </ion-item>
+    </ion-card>
+    <ion-item><h6>Sort by:</h6></ion-item>
+    <ion-card>
+      <ion-item>
+        <ion-label>Parameter</ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="sort_param">
+          <ion-select-option value="()">None</ion-select-option>
+          <div *ngFor="let d of variables;let i=index">
+            <ion-select-option value="{{variables[i]}}">{{variables[i]}}</ion-select-option>
+          </div>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Ordering</ion-label>
+        <ion-select value="1" okText="Select" cancelText="Close" [(ngModel)]="sort_by">
+          <ion-select-option value="()">None</ion-select-option>
+          <ion-select-option value="ASCENDING">Ascending</ion-select-option>
+          <ion-select-option value="DESCENDING">Descending</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+    </ion-card>
+    <ion-card-content>
+      <ion-button expand="full" class="shade1" (click)=refresh_qd()>QUERY DATA</ion-button>
+    </ion-card-content>
+
+    <div *ngIf="show_data">
+      <ion-item><h5>Filtered Data </h5><p><small>ㅤLoaded: {{query_data.length}}</small></p></ion-item>
+      <ion-list>
+        <div *ngFor="let d of query_data">
+          <ion-card>
+            <ion-card-content>
+              <ion-grid fixed="true">
+                <ion-row>
+                  <ion-col><p>Diabetes: {{d['Diabetes']}}</p></ion-col>
+                  <ion-col><p>High BP: {{d['High BP']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>High Chol: {{d['High Chol']}}</p></ion-col>
+                  <ion-col><p>Chol Check: {{d['Chol Check']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>BMI: {{d['BMI']}}</p></ion-col>
+                  <ion-col><p>Smoker: {{d['Smoker']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Stroke: {{d['Stroke']}}</p></ion-col>
+                  <ion-col><p>Heart Dis: {{d['Heart Dis']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Exercise: {{d['Exercise']}}</p></ion-col>
+                  <ion-col><p>Fruits: {{d['Fruits']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Vegetables: {{d['Vegetables']}}</p></ion-col>
+                  <ion-col><p>Alcohol: {{d['Alcohol']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Hlth Care: {{d['Hlth Care']}}</p></ion-col>
+                  <ion-col><p>Med Cost: {{d['Med Cost']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Gen Hlth: {{d['Gen Hlth']}}</p></ion-col>
+                  <ion-col><p>Men Hlth: {{d['Men Hlth']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Phy Hlth: {{d['Phy Hlth']}}</p></ion-col>
+                  <ion-col><p>Diff Walk: {{d['Diff Walk']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Sex: {{d['Sex']}}</p></ion-col>
+                  <ion-col><p>Age: {{d['Age']}}</p></ion-col>
+                </ion-row>
+                <ion-row>
+                  <ion-col><p>Education: {{d['Education']}}</p></ion-col>
+                  <ion-col><p>Income: {{d['Income']}}</p></ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-list>
+      <ion-infinite-scroll threshold="100px" (ionInfinite)="queryData($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Loading more data...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </div>
+  </ion-card>
+
+</ion-content>
